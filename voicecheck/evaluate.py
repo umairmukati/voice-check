@@ -200,6 +200,7 @@ def main():
         "motion_check_fails": dict(zip((f"{x:g}" for x in durs), (test["motion_match"] < motion_thr).mean(axis=0))),
         "how_it_fails": how_it_fails(test, d, thr["read", d], motion_thr[index(test, d)], TIERS["read"]["frr"]),
         "own_idea": own_idea(dev, test, thr, by_length),
+        "thresholds": {t: {f"{d:g}": thr[t, d] for d in durs} for t in TIERS},  # voice check, used by the demo
     }
     OUT.mkdir(exist_ok=True)
     (OUT / "results.json").write_text(json.dumps(results, indent=1, default=lambda o: o.item()))
