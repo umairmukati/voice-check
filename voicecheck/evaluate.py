@@ -207,6 +207,11 @@ def main():
     results = json.loads((OUT / "results.json").read_text())  # report only from what was saved
     (OUT / "summary.md").write_text(summary(results))
     plot(results, OUT / "owner_lockout_by_speech.png")
+    for t, a in results["answer"].items():
+        m = results["by_length"][t][f"{a['shown_at']:g}"]
+        print(f"  {t}: owner shut out {pct(m['owner_shut_out'])} at {a['shown_at']:g} s, "
+              f"lookalike in {pct(m['lookalike_in'], 2)}, limits met: {'yes' if a['met'] else 'no'}")
+    print(f"  Written: {OUT}/summary.md, {OUT}/results.json, {OUT}/owner_lockout_by_speech.png")
 
 
 # ---------- Report (from results.json only: measured values, no conclusions) ----------

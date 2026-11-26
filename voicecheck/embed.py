@@ -1,8 +1,11 @@
 """Embed each speaker's 30 s setup and test clips of several lengths."""
+import warnings
 from pathlib import Path
 
 import numpy as np
-from resemblyzer import VoiceEncoder, preprocess_wav
+
+warnings.filterwarnings("ignore", message="FNV hashing")  # harmless numba notice, raised on import
+from resemblyzer import VoiceEncoder, preprocess_wav  # noqa: E402
 
 from . import channels
 from .data import PARTS, speakers
@@ -62,7 +65,8 @@ def build(part, enc, rng):
     out ={k: [] for k in ["ids", "sex", "clean", "replay", "motion_match", "motion_match_replay"]}
     enrol_ids, enrol_sex, enrol, motion_match_setup = [], [], [], []
     span = int(max(DURS) * SR)
-    for spk, info in speakers(part).items():
+    spks, clips = speakers(part), 0
+    for done, (spk, info) in enumerate(spks.items(), 1):
         chapters = info["chapters"]
         # Setup: 30 s of speech from the first chapter (one session).
         wavs, used = [], set()
@@ -97,7 +101,9 @@ def build(part, enc, rng):
             n += 1
             if n == N_TEST:
                 break
-        print(f"{part} {spk}: {n} test clips")
+        clips += n
+        print(f"\r  {part}: {done}/{len(spks)} speakers, {clips} test clips", end="", flush=True)
+    print()
     out = {k: np.array(v) for k, v in out.items()}
     out.update(enrol=np.array(enrol), enrol_ids=np.array(enrol_ids), enrol_sex=np.array(enrol_sex),
                motion_match_setup=np.array(motion_match_setup), durs=np.array(DURS), leaks=np.array(LEAKS))
@@ -106,6 +112,6 @@ def build(part, enc, rng):
 
 if __name__ == "__main__":
     CACHE.mkdir(exist_ok=True)
-    enc = VoiceEncoder("cpu")
+    enc = VoiceEncoder("cpu", verbose=False)
     for i, part in enumerate(PARTS):
         np.savez(CACHE / f"{part}.npz", **build(part, enc, np.random.default_rng(i)))
