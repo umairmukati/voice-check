@@ -9,7 +9,7 @@ SPACE=${1:?usage: bash demo/deploy.sh <user>/<space>}
 [ -d demo/examples ] || uv run -q --locked python -m demo.make_examples
 
 stage=$(mktemp -d)
-cp demo/app.py demo/voice.py demo/views.py demo/theme.py demo/style.css demo/requirements.txt demo/README.md \
+cp demo/app.py demo/voice.py demo/views.py demo/theme.py demo/style.css demo/requirements.txt demo/packages.txt demo/README.md \
    results/results.json "$stage"/
 cp -R demo/examples "$stage"/examples
 uv run -q --locked --group demo hf upload "$SPACE" "$stage" . --repo-type space --private

@@ -1,9 +1,12 @@
 """The voice check: speaker model, thresholds from results.json, and scoring. No web code here."""
 import json
+import tempfile
 import warnings
 from pathlib import Path
 
 warnings.filterwarnings("ignore", message="FNV hashing")  # harmless numba notice, raised on import
+import librosa  # noqa: E402
+import soundfile as sf  # noqa: E402
 from resemblyzer import VoiceEncoder, preprocess_wav  # noqa: E402
 
 HERE = Path(__file__).parent
@@ -19,6 +22,14 @@ ENC = VoiceEncoder("cpu", verbose=False)
 def speech(path):
     """Audio file -> 16 kHz speech with silence removed."""
     return preprocess_wav(Path(path))
+
+
+def to_wav(path):
+    """Any audio file (m4a, opus, mp3, mp4, ...) -> path of a 16 kHz WAV copy that every browser can play."""
+    x, _ = librosa.load(path, sr=SR, mono=True)
+    out = Path(tempfile.mkdtemp()) / f"{Path(path).stem}.wav"
+    sf.write(out, x, SR)
+    return str(out)
 
 
 def enrol(path):

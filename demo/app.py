@@ -47,6 +47,16 @@ def owner_source(path, mine):
             gr.Button(visible=mine is not None and path != mine))
 
 
+def any_file(path):
+    """Uploaded file of any type -> playable WAV for the audio box (which then runs setup or check)."""
+    if not path:
+        return gr.skip()
+    try:
+        return voice.to_wav(path)
+    except Exception:
+        raise gr.Error(f"Could not read {Path(path).name} as audio.")
+
+
 def check(path, owner):
     """A request -> the result panel. Ignores events that carry no audio yet."""
     log("check", path)
@@ -71,11 +81,13 @@ with gr.Blocks(title="Whose voice is this?") as demo:
                                    editable=False)
             with gr.Row():
                 owner_status = gr.HTML(views.chip(False, "No owner set up"))
+                setup_file = gr.UploadButton("Upload any audio file", size="sm", scale=0)
                 example_owner = gr.Button("Use example owner", size="sm", scale=0)
                 my_owner = gr.Button("Back to my recording", size="sm", scale=0, visible=False)
         with gr.Column():
             gr.HTML(views.STEP_CHECK)
             check_audio = gr.Audio(sources=["microphone", "upload"], type="filepath", label="Request", editable=False)
+            check_file = gr.UploadButton("Upload any audio file", size="sm")
             with gr.Column(visible=False) as tries_box:
                 gr.HTML(views.EXAMPLES_NOTE)
                 with gr.Row():
@@ -93,6 +105,8 @@ with gr.Blocks(title="Whose voice is this?") as demo:
                       [owner, owner_status, tries_box])
     gr.on([check_audio.change, check_audio.stop_recording, check_audio.upload], check, [check_audio, owner], result)
     check_audio.clear(lambda: views.note("Record or upload a request to see the result."), None, result)
+    setup_file.upload(any_file, setup_file, setup_audio)
+    check_file.upload(any_file, check_file, check_audio)
     example_owner.click(lambda: str(EXAMPLES / EXAMPLE_OWNER), None, setup_audio)
     my_owner.click(lambda mine: mine, my_setup, setup_audio)
     for btn, f in tries:
