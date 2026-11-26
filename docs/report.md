@@ -4,6 +4,8 @@
 
 One open speaker model (Resemblyzer), a 30 s setup per person, and a cosine score against the setup. A request passes if its voice score is high enough (voice check) and the motion sensor moves with the speech (motion check). Limits and speech length are chosen on 20 speakers and reported on 20 others (LibriSpeech test-clean).
 
+Why Resemblyzer: open, small (17 MB) and fast on a laptop CPU (0.4 s for a 3 s request), so it could fit on a headset. The model was not trained for very short speech, a model built for it would do better.
+
 ## Answer
 
 No speech length meets a 5% owner lockout for any action, even 10 s. So I chose each length where more speech stops helping, and the check never refuses outright: when unsure, it listens longer, then asks for one tap on the phone.
@@ -41,6 +43,24 @@ Past 3 s, more speech barely helps: read is 9.6% at 3 s and 8.5% at 10 s. The lo
 
 Pool the short requests made while the headset stays on. Three 2 s requests shut the owner out 18.0% at the act limit, worse than one 5 s request (14.5%, voice only). Pooling lets short requests add up, but it does not beat speaking longer.
 
+## What I cut
+
+- **Voice clones.** Testing them needs a cloning tool and my own voice. The motion check does not depend on how good a clone is.
+- **Real sensor data.** None is public, so the motion sensor and loudspeaker are simulated.
+- **Noise, accents, other microphones.** Clean audiobooks only.
+- **More speakers.** test-clean's 40 only; more would mainly help prove the act and pay limits.
+- **A spoof detector.** One more signal, never the only one (see the design).
+
+## What I would fix first
+
+1. **Check the setup.** Ask for more speech when the setup does not match the owner's own later speech well (owner 4446).
+2. **Real headset audio.** Record with a headset, in noise, with a real motion sensor.
+3. **More speakers,** to prove the act and pay limits.
+
+## Demo
+
+A small web app: set up your own voice, then check who is speaking. See [run.md](run.md#demo).
+
 ## Limits
 
 - 40 read-aloud speakers, clean audio. Real headsets, noise and accents will be worse.
@@ -50,4 +70,4 @@ Pool the short requests made while the headset stays on. Three 2 s requests shut
 
 ## How I built it
 
-Python, Resemblyzer (GE2E), NumPy, SciPy, Matplotlib. Full numbers: [results/summary.md](../results/summary.md).
+Python, Resemblyzer (GE2E), NumPy, SciPy, Matplotlib, Gradio for the demo. Full numbers: [results/summary.md](../results/summary.md).
