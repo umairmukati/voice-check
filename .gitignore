@@ -4,3 +4,4 @@ cache/
 *.pdf
 __pycache__/
 *.pyc
+demo/examples/

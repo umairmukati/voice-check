@@ -1,0 +1,81 @@
+/* Styles for the page's own HTML (classes start with vc- so they never clash with Gradio's). */
+:root {
+  --vc-accent: #FFC400;
+  --vc-surface: #232427;
+  --vc-raised: #2b2c30;
+  --vc-line: #313236;
+  --vc-text: #d9d9dc;
+  --vc-muted: #a3a5ab;
+  --vc-faint: #8d8f95;
+}
+
+.gradio-container { max-width: 1180px !important; }
+.playback { font-size: .75rem !important; height: auto !important; line-height: 1.4; } /* Gradio speed button */
+
+/* Header */
+.vc-hero { display: flex; align-items: center; justify-content: space-between; gap: 2rem; padding: .5rem .2rem 1rem; }
+.vc-hero h1 { font-size: 2.4rem; font-weight: 700; margin: .2rem 0 0; letter-spacing: -.02em; }
+.vc-hero p { color: var(--vc-muted); margin: .4rem 0 1rem; font-size: 1.05rem; }
+.vc-headset { width: 150px; flex: none; }
+.vc-accent { fill: var(--vc-accent); }
+.vc-facts { display: flex; gap: 1.8rem; flex-wrap: wrap; }
+.vc-fact b { display: block; font-size: 1.4rem; color: var(--vc-accent); }
+.vc-fact span { color: var(--vc-muted); font-size: .85rem; }
+
+/* Steps */
+.vc-step-head { display: flex; align-items: center; gap: .7rem; margin-bottom: .3rem; }
+.vc-step-head h3 { margin: 0; font-size: 1.15rem; }
+.vc-step-num { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--vc-accent); color: var(--vc-accent);
+               display: grid; place-items: center; font-weight: 700; font-size: .9rem; }
+.vc-muted { color: var(--vc-muted); font-size: .92rem; margin: .2rem 0 .6rem; }
+.vc-script { background: #1b1c1f; border-left: 3px solid var(--vc-accent); border-radius: 10px; padding: .8rem 1rem;
+             line-height: 1.6; color: var(--vc-text); }
+.vc-chip { display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .85rem; border-radius: 999px;
+           background: var(--vc-raised); font-size: .88rem; color: var(--vc-text); }
+.vc-dot { width: 8px; height: 8px; border-radius: 50%; background: #6b6d73; }
+.vc-chip.on .vc-dot { background: var(--vc-accent); }
+
+/* Result */
+.vc-panel { background: var(--vc-surface); border: 1px solid var(--vc-line); border-radius: 16px; padding: 1.2rem 1.4rem;
+            margin-top: .9rem; }
+.vc-note { color: var(--vc-muted); text-align: center; }
+.vc-eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .72rem; color: var(--vc-faint); }
+.vc-result { display: grid; grid-template-columns: 220px 1fr; gap: 1.6rem; align-items: center; }
+.vc-res-left { display: grid; justify-items: center; gap: .2rem; }
+.vc-caption { color: var(--vc-faint); font-size: .85rem; }
+.vc-res-title { font-size: 1.6rem; font-weight: 700; margin: .2rem 0 .8rem; }
+.vc-res-title.on { color: var(--vc-accent); }
+
+.vc-gauge { width: 180px; }
+.vc-g-track { fill: none; stroke: #34353a; stroke-width: 12; }
+.vc-g-arc { fill: none; stroke: var(--vc-accent); stroke-width: 12; stroke-linecap: round; }
+.vc-g-tick { stroke: #e8e8ea; stroke-width: 2.5; }
+.vc-g-num { font-size: 30px; font-weight: 700; fill: #f2f2f3; }
+.vc-g-label { font-size: 11px; fill: var(--vc-faint); letter-spacing: .12em; }
+
+.vc-rows { display: grid; }
+.vc-row { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: .6rem; padding: .75rem 0;
+          border-top: 1px solid var(--vc-line); }
+.vc-row-icon { color: #c9cace; display: grid; }
+.vc-row-name { font-weight: 600; }
+.vc-status { display: inline-flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--vc-muted); }
+.vc-status.on { color: var(--vc-accent); }
+.vc-status.info { color: var(--vc-text); }
+
+/* Score per speech length */
+.vc-bars { display: flex; gap: 1.6rem; align-items: flex-end; margin-top: .6rem; }
+.vc-bar-wrap { display: grid; justify-items: center; gap: .25rem; }
+.vc-bar { position: relative; width: 36px; height: 120px; border-radius: 10px; background: var(--vc-raised);
+          overflow: hidden; display: flex; align-items: flex-end; }
+.vc-bar-fill { width: 100%; background: #55575d; border-radius: 10px; }
+.vc-bar-fill.on { background: var(--vc-accent); }
+.vc-bar-tick { position: absolute; left: 0; right: 0; height: 2px; background: #e8e8ea; }
+.vc-bar-val { font-weight: 600; font-size: .9rem; }
+.vc-bar-len { color: var(--vc-faint); font-size: .8rem; }
+
+.vc-foot { color: #7d7f85; font-size: .82rem; line-height: 1.5; margin-top: 1rem; }
+
+@media (max-width: 720px) {
+  .vc-result { grid-template-columns: 1fr; }
+  .vc-headset { display: none; }
+}
