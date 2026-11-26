@@ -1,6 +1,8 @@
 """The voice check: speaker model, thresholds from results.json, and scoring. No web code here."""
 import json
+import shutil
 import tempfile
+import time
 import warnings
 from pathlib import Path
 
@@ -16,6 +18,8 @@ MIN_SETUP_S = 3
 RESULTS = next(p for p in (HERE / "results.json", HERE.parent / "results" / "results.json") if p.exists())
 THR = json.loads(RESULTS.read_text())["thresholds"]  # action -> speech length (s) -> voice threshold
 LENGTHS = sorted(float(d) for d in THR["read"])
+KEEP_S = 3600  # recordings and uploads are deleted after an hour
+TMP = Path(tempfile.gettempdir()) / "voice-check-demo"  # converted uploads
 ENC = VoiceEncoder("cpu", verbose=False)
 
 
@@ -26,8 +30,12 @@ def speech(path):
 
 def to_wav(path):
     """Any audio file (m4a, opus, mp3, mp4, ...) -> path of a 16 kHz WAV copy that every browser can play."""
+    TMP.mkdir(exist_ok=True)
+    for old in TMP.iterdir():  # delete earlier conversions older than KEEP_S
+        if time.time() - old.stat().st_mtime > KEEP_S:
+            shutil.rmtree(old, ignore_errors=True)
     x, _ = librosa.load(path, sr=SR, mono=True)
-    out = Path(tempfile.mkdtemp()) / f"{Path(path).stem}.wav"
+    out = Path(tempfile.mkdtemp(dir=TMP)) / f"{Path(path).stem}.wav"
     sf.write(out, x, SR)
     return str(out)
 

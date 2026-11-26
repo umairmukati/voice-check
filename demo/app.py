@@ -16,6 +16,7 @@ HERE = Path(__file__).parent
 EXAMPLES = HERE / "examples"
 EXAMPLE_OWNER = "owner_setup.wav"
 TRIES = [("7176, another day", "owner_later.wav"), ("Colleague", "colleague.wav"), ("Lookalike", "lookalike.wav")]
+HAS_EXAMPLES = all((EXAMPLES / f).exists() for f in [EXAMPLE_OWNER, *(f for _, f in TRIES)])  # built by make_examples
 
 
 def log(event, path):
@@ -43,7 +44,7 @@ def owner_source(path, mine):
     example = Path(path).name == EXAMPLE_OWNER
     if not example:
         mine = path
-    return (gr.Column(visible=example), mine, gr.Button(visible=not example),
+    return (gr.Column(visible=example), mine, gr.Button(visible=HAS_EXAMPLES and not example),
             gr.Button(visible=mine is not None and path != mine))
 
 
@@ -70,7 +71,8 @@ def check(path, owner):
     return views.result_panel(scores)
 
 
-with gr.Blocks(title="Whose voice is this?") as demo:
+# Gradio keeps recordings and uploads in a temp folder: check every 10 min, delete those older than KEEP_S.
+with gr.Blocks(title="Whose voice is this?", delete_cache=(600, voice.KEEP_S)) as demo:
     owner = gr.State(None)
     my_setup = gr.State(None)  # the user's own setup recording, to switch back to after the example
     gr.HTML(views.HERO)
@@ -82,7 +84,7 @@ with gr.Blocks(title="Whose voice is this?") as demo:
             with gr.Row():
                 owner_status = gr.HTML(views.chip(False, "No owner set up"))
                 setup_file = gr.UploadButton("Upload any audio file", size="sm", scale=0)
-                example_owner = gr.Button("Use example owner", size="sm", scale=0)
+                example_owner = gr.Button("Use example owner", size="sm", scale=0, visible=HAS_EXAMPLES)
                 my_owner = gr.Button("Back to my recording", size="sm", scale=0, visible=False)
         with gr.Column():
             gr.HTML(views.STEP_CHECK)

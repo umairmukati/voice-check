@@ -39,7 +39,7 @@ HERO = ('<div class="vc-hero"><div><div class="vc-eyebrow">Voice check for a hea
         '<p>The agent works only for its owner. Set up an owner, then see who gets in.</p>'
         '<div class="vc-facts"><div class="vc-fact"><b>30 s</b><span>to set up</span></div>'
         '<div class="vc-fact"><b>3 s</b><span>to read a message</span></div>'
-        f'<div class="vc-fact"><b>0</b><span>recordings stored</span></div></div></div>{HEADSET}</div>')
+        f'<div class="vc-fact"><b>1 h</b><span>until recordings are deleted</span></div></div></div>{HEADSET}</div>')
 
 STEP_SETUP = ('<div class="vc-step-head"><span class="vc-step-num">1</span><h3>Set up the owner</h3></div>'
               '<div class="vc-muted">Read this the way you talk to your headset, for about 30 s. Setup uses the '
