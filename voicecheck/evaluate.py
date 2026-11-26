@@ -248,8 +248,9 @@ def summary(r):
         *table(["Action", "Limits: strangers in / owner shut out", "Speech chosen on dev", "Measured at",
                 "Owner shut out (95% CI)", "Colleague in", "Lookalike in (95% upper)", "Limits met", "Stranger limit proven"],
                [answer_row(t) for t in TIERS]),
-        "", "## Owner shut out by speech length", "",
-        *table(["Speech", *TIERS], [[f"{d} s", *(pct(L[t][d]["owner_shut_out"]) for t in TIERS)] for d in L["read"]]),
+        "", "## By speech length: owner shut out / lookalike in", "",
+        *table(["Speech", *TIERS], [[f"{d} s", *(f"{pct(L[t][d]['owner_shut_out'])} / {pct(L[t][d]['lookalike_in'], 2)}"
+                                                 for t in TIERS)] for d in L["read"]]),
         "", "## Motion check: owner fails", "",
         *table(["Speech", *(f"{d} s" for d in r["motion_check_fails"])], [["Owner fails", *map(pct, r["motion_check_fails"].values())]]),
         "", "## Replay passes (simulated, read limit)", "",
