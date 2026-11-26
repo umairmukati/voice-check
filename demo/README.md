@@ -19,6 +19,4 @@ uv run python -m demo.make_examples
 uv run --group demo python demo/app.py      # http://127.0.0.1:7860
 ```
 
-**Share:**
-- Permanent: `uv run --group demo hf auth login`, then `bash demo/deploy.sh <user>/voice-check`, then make the Space public in its Settings.
-- Temporary: `SHARE=1 uv run --group demo python demo/app.py` prints a public link that works while the app runs.
+**Share:** `SHARE=1 uv run --group demo python demo/app.py` prints a temporary public link that works while the app runs. Open it on any device, phones included.

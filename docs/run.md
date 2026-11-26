@@ -20,6 +20,16 @@ bash run.sh
 - Data: LibriSpeech test-clean, from a public GitHub copy ([aligned-librispeech](https://github.com/MontrealCorpusTools/aligned-librispeech)), downloaded once.
 - Seeds are fixed, so the numbers repeat exactly.
 
+## Demo
+
+```
+# After run.sh: build the example clips, then open the app in a browser
+uv run python -m demo.make_examples
+uv run --group demo python demo/app.py
+```
+
+Set up an owner from the microphone or a file, then check a request. To share it, run `SHARE=1 uv run --group demo python demo/app.py`: it prints a temporary public link that works while the app runs.
+
 ## Files
 
 ```
@@ -32,4 +42,5 @@ voicecheck/
   evaluate.py     choose limits on dev, report on test
   speakers.csv    speaker sex, from LibriSpeech
 results/          summary.md, results.json, plot
+demo/             Gradio app, example clips, Space deploy
 ```
