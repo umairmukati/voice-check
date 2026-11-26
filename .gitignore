@@ -1,3 +1,6 @@
+.venv/
+data/
+cache/
 *.pdf
-*.npz
 __pycache__/
+*.pyc

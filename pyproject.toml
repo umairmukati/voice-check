@@ -1,0 +1,30 @@
+[project]
+name = "voicecheck"
+version = "0.1.0"
+description = "Is the voice the owner's? A speaker check for a headset agent."
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "resemblyzer==0.1.4",
+    "webrtcvad-wheels>=2.0.11",  # same module as webrtcvad, prebuilt: no C compiler needed
+    "torch==2.2.2",              # last release with Intel Mac wheels
+    "numpy==1.26.4",             # torch 2.2 needs numpy 1.x
+    "scipy==1.13.1",
+    "soundfile==0.13.1",
+    "matplotlib==3.9.4",
+    "setuptools<81",             # resemblyzer imports pkg_resources
+]
+
+[tool.uv]
+package = false
+# Resemblyzer asks for webrtcvad, which must be compiled; webrtcvad-wheels replaces it.
+override-dependencies = ["webrtcvad; sys_platform == 'never'"]
+# Newest numba / llvmlite that still ship Intel Mac wheels.
+constraint-dependencies = ["numba<0.63", "llvmlite<0.46"]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
