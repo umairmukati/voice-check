@@ -42,8 +42,9 @@ HERO = ('<div class="vc-hero"><div><div class="vc-eyebrow">Voice check for a hea
         f'<div class="vc-fact"><b>1 h</b><span>until recordings are deleted</span></div></div></div>{HEADSET}</div>')
 
 STEP_SETUP = ('<div class="vc-step-head"><span class="vc-step-num">1</span><h3>Set up the owner</h3></div>'
-              '<div class="vc-muted">Read this the way you talk to your headset, for about 30 s. Setup uses the '
-              'first 30 s of speech and runs when you stop recording.</div>'
+              '<div class="vc-muted">Record the script below for about 30 s. Setup runs when you stop.</div>')
+
+SCRIPT_BOX = ('<div class="vc-muted">Read it the way you talk to your headset; the first 30 s of speech are used.</div>'
               f'<div class="vc-script">{SCRIPT}</div>')
 
 STEP_CHECK = ('<div class="vc-step-head"><span class="vc-step-num">2</span><h3>Who is speaking?</h3></div>'

@@ -84,14 +84,17 @@ with gr.Blocks(title="Whose voice is this?", delete_cache=(600, voice.KEEP_S)) a
     owner = gr.State(None)
     saved = gr.BrowserState({}, storage_key="voice-check-speakers")  # name -> voiceprint, kept in this browser
     gr.HTML(views.HERO)
+    with gr.Row(equal_height=True):  # step headings side by side, so the two audio boxes below start level
+        gr.HTML(views.STEP_SETUP)
+        gr.HTML(views.STEP_CHECK)
     with gr.Row(equal_height=False):
         with gr.Column():
-            gr.HTML(views.STEP_SETUP)
             setup_audio = gr.Audio(sources=["microphone", "upload"], type="filepath", label="Owner's voice",
                                    editable=False)
             with gr.Row(equal_height=True):
                 setup_file = gr.UploadButton("Upload any audio file")
                 example_owner = gr.Button("Use example owner", visible=HAS_EXAMPLES)
+            gr.HTML(views.SCRIPT_BOX)
             owner_status = gr.HTML(views.chip(False, "No owner set up"))
             with gr.Row(equal_height=True):
                 speaker_name = gr.Textbox(show_label=False, placeholder="Name this voice, e.g. Speaker 1",
@@ -100,7 +103,6 @@ with gr.Blocks(title="Whose voice is this?", delete_cache=(600, voice.KEEP_S)) a
             saved_list = gr.Dropdown(choices=[], value=None, label="Saved speakers (kept in this browser)",
                                      interactive=True)
         with gr.Column():
-            gr.HTML(views.STEP_CHECK)
             check_audio = gr.Audio(sources=["microphone", "upload"], type="filepath", label="Request", editable=False)
             with gr.Row(equal_height=True):
                 check_file = gr.UploadButton("Upload any audio file")
