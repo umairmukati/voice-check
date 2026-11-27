@@ -140,7 +140,8 @@ def choose(tier, dev, thr, motion_thr, measured):
     shown = ok[0] if ok else durs[-1]
     m = measured[f"{shown:g}"]
     return {"speech": ok[0] if ok else None, "shown_at": shown,
-            "met": m["owner_shut_out"] <= lim["frr"] and max(m["colleague_in"], m["lookalike_in"]) <= lim["far"],
+            "strangers_met": max(m["colleague_in"], m["lookalike_in"]) <= lim["far"],
+            "owner_met": m["owner_shut_out"] <= lim["frr"],
             "proven": m["lookalike_in_upper"] <= lim["far"]}
 
 
@@ -211,7 +212,8 @@ def main():
     for t, a in results["answer"].items():
         m = results["by_length"][t][f"{a['shown_at']:g}"]
         print(f"  {t}: owner shut out {pct(m['owner_shut_out'])} at {a['shown_at']:g} s, "
-              f"lookalike in {pct(m['lookalike_in'], 2)}, limits met: {'yes' if a['met'] else 'no'}")
+              f"lookalike in {pct(m['lookalike_in'], 2)}, strangers limit met: {'yes' if a['strangers_met'] else 'no'}, "
+              f"owner limit met: {'yes' if a['owner_met'] else 'no'}")
     print(f"  Written: {OUT}/summary.md, {OUT}/results.json, {OUT}/owner_lockout_by_speech.png")
 
 
@@ -240,7 +242,7 @@ def summary(r):
         return [t, f"1 in {1 / lim[t]['far']:,.0f} / {pct(lim[t]['frr'])}",
                 *([] if same else [f"{a[t]['shown_at']:g} s"]),
                 f"{pct(m['owner_shut_out'])} ({pct(lo)}–{pct(hi)})", pct(m["colleague_in"], 2),
-                f"{pct(m['lookalike_in'], 2)} ({pct(m['lookalike_in_upper'], 2)})", yn(a[t]["met"]), yn(a[t]["proven"])]
+                f"{pct(m['lookalike_in'], 2)} ({pct(m['lookalike_in_upper'], 2)})", yn(a[t]["strangers_met"]), yn(a[t]["proven"]), yn(a[t]["owner_met"])]
 
     leaks = list(L["read"]["1"]["replay_in_both"])
     replay_rows = [[f"{d} s", pct(m["replay_in_voice"], 2), *(pct(m["replay_in_both"][k], 2) for k in leaks),
@@ -258,7 +260,8 @@ def summary(r):
         "Speech: the shortest length whose owner lockout meets the limit on the dev speakers, else the longest. "
         + (f"Here: {shown.pop():g} s for every action." if same else ""), "",
         *table(["Action", "Limits: strangers in / owner shut out", *([] if same else ["Speech"]),
-                "Owner shut out (95% CI)", "Colleague in", "Lookalike in (95% upper)", "Limits met", "Stranger limit proven"],
+                "Owner shut out (95% CI)", "Colleague in", "Lookalike in (95% upper)", "Strangers limit met",
+                "Strangers limit proven", "Owner limit met"],
                [answer_row(t) for t in TIERS]),
         "", "## By speech length: owner shut out / lookalike in", "",
         *table(["Speech", *TIERS], [[f"{d} s", *(f"{pct(L[t][d]['owner_shut_out'])} / {pct(L[t][d]['lookalike_in'], 2)}"

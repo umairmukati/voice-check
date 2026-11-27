@@ -26,19 +26,22 @@
   "read": {
    "speech": null,
    "shown_at": 10.0,
-   "met": false,
+   "strangers_met": true,
+   "owner_met": false,
    "proven": true
   },
   "act": {
    "speech": null,
    "shown_at": 10.0,
-   "met": false,
+   "strangers_met": true,
+   "owner_met": false,
    "proven": false
   },
   "pay": {
    "speech": null,
    "shown_at": 10.0,
-   "met": false,
+   "strangers_met": true,
+   "owner_met": false,
    "proven": false
   }
  },

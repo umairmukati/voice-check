@@ -6,11 +6,11 @@ Test: 20 speakers. Limits and speech length chosen on 20 other speakers. Trials 
 
 Speech: the shortest length whose owner lockout meets the limit on the dev speakers, else the longest. Here: 10 s for every action.
 
-| Action | Limits: strangers in / owner shut out | Owner shut out (95% CI) | Colleague in | Lookalike in (95% upper) | Limits met | Stranger limit proven |
-|---|---|---|---|---|---|---|
-| read | 1 in 100 / 5.0% | 8.5% (6.3%–11.2%) | 0.02% | 0.04% (0.18%) | no | yes |
-| act | 1 in 1,000 / 5.0% | 14.5% (11.6%–17.8%) | 0.00% | 0.00% (0.11%) | no | no |
-| pay | 1 in 10,000 / 5.0% | 15.8% (12.8%–19.2%) | 0.00% | 0.00% (0.11%) | no | no |
+| Action | Limits: strangers in / owner shut out | Owner shut out (95% CI) | Colleague in | Lookalike in (95% upper) | Strangers limit met | Strangers limit proven | Owner limit met |
+|---|---|---|---|---|---|---|---|
+| read | 1 in 100 / 5.0% | 8.5% (6.3%–11.2%) | 0.02% | 0.04% (0.18%) | yes | yes | no |
+| act | 1 in 1,000 / 5.0% | 14.5% (11.6%–17.8%) | 0.00% | 0.00% (0.11%) | yes | no | no |
+| pay | 1 in 10,000 / 5.0% | 15.8% (12.8%–19.2%) | 0.00% | 0.00% (0.11%) | yes | no | no |
 
 ## By speech length: owner shut out / lookalike in
 
