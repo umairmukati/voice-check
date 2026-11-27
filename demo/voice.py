@@ -8,6 +8,7 @@ from pathlib import Path
 
 warnings.filterwarnings("ignore", message="FNV hashing")  # harmless numba notice, raised on import
 import librosa  # noqa: E402
+import numpy as np  # noqa: E402
 import soundfile as sf  # noqa: E402
 from resemblyzer import VoiceEncoder, preprocess_wav  # noqa: E402
 
@@ -44,6 +45,11 @@ def enrol(path):
     """Setup recording -> (owner embedding or None if too short, seconds of speech used)."""
     x = speech(path)[: SETUP_S * SR]
     return (ENC.embed_utterance(x) if len(x) >= MIN_SETUP_S * SR else None), len(x) / SR
+
+
+def as_owner(voiceprint):
+    """Saved voiceprint (list of floats) -> owner embedding."""
+    return np.asarray(voiceprint, dtype=np.float32)
 
 
 def score(path, owner):

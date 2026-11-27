@@ -34,18 +34,26 @@ def set_up(path):
     return owner, views.chip(True, f"Owner ready, {secs:.0f} s of speech")
 
 
-def owner_source(path, mine):
-    """Track whose voice is set up: the example owner, or the user's own recording (kept to switch back to).
+def example_requests(path):
+    """Show the example requests only while the example owner is set up."""
+    return gr.Column(visible=bool(path) and Path(path).name == EXAMPLE_OWNER)
 
-    Returns: example requests (shown only for the example owner), the user's recording, and which switch button shows.
-    """
-    if not path:
+
+def save_speaker(name, owner, saved):
+    """Keep the current owner's voiceprint (not the recording) in this browser, under a name."""
+    if owner is None:
+        raise gr.Error("Set up an owner first, then save it.")
+    name = (name or "").strip() or f"Speaker {len(saved) + 1}"
+    saved = {**saved, name: [float(v) for v in owner]}
+    return saved, gr.Dropdown(choices=list(saved), value=None), "", views.chip(True, f"Owner ready, saved as {name}")
+
+
+def use_speaker(name, saved):
+    """Pick a saved speaker as the owner. Clears the setup audio, which belonged to whoever was set up before."""
+    if not name or name not in saved:
         return gr.skip(), gr.skip(), gr.skip(), gr.skip()
-    example = Path(path).name == EXAMPLE_OWNER
-    if not example:
-        mine = path
-    return (gr.Column(visible=example), mine, gr.Button(visible=HAS_EXAMPLES and not example),
-            gr.Button(visible=mine is not None and path != mine))
+    return (voice.as_owner(saved[name]), views.chip(True, f"Owner: {name} (saved)"), None,
+            gr.Column(visible=False))
 
 
 def any_file(path):
@@ -74,25 +82,31 @@ def check(path, owner):
 # Gradio keeps recordings and uploads in a temp folder: check every 10 min, delete those older than KEEP_S.
 with gr.Blocks(title="Whose voice is this?", delete_cache=(600, voice.KEEP_S)) as demo:
     owner = gr.State(None)
-    my_setup = gr.State(None)  # the user's own setup recording, to switch back to after the example
+    saved = gr.BrowserState({}, storage_key="voice-check-speakers")  # name -> voiceprint, kept in this browser
     gr.HTML(views.HERO)
     with gr.Row(equal_height=False):
         with gr.Column():
             gr.HTML(views.STEP_SETUP)
             setup_audio = gr.Audio(sources=["microphone", "upload"], type="filepath", label="Owner's voice",
                                    editable=False)
-            with gr.Row():
-                owner_status = gr.HTML(views.chip(False, "No owner set up"))
-                setup_file = gr.UploadButton("Upload any audio file", size="sm", scale=0)
-                example_owner = gr.Button("Use example owner", size="sm", scale=0, visible=HAS_EXAMPLES)
-                my_owner = gr.Button("Back to my recording", size="sm", scale=0, visible=False)
+            with gr.Row(equal_height=True):
+                setup_file = gr.UploadButton("Upload any audio file")
+                example_owner = gr.Button("Use example owner", visible=HAS_EXAMPLES)
+            owner_status = gr.HTML(views.chip(False, "No owner set up"))
+            with gr.Row(equal_height=True):
+                speaker_name = gr.Textbox(show_label=False, placeholder="Name this voice, e.g. Speaker 1",
+                                          container=False, scale=3)
+                save_btn = gr.Button("Save speaker", scale=1)
+            saved_list = gr.Dropdown(choices=[], value=None, label="Saved speakers (kept in this browser)",
+                                     interactive=True)
         with gr.Column():
             gr.HTML(views.STEP_CHECK)
             check_audio = gr.Audio(sources=["microphone", "upload"], type="filepath", label="Request", editable=False)
-            check_file = gr.UploadButton("Upload any audio file", size="sm")
+            with gr.Row(equal_height=True):
+                check_file = gr.UploadButton("Upload any audio file")
             with gr.Column(visible=False) as tries_box:
                 gr.HTML(views.EXAMPLES_NOTE)
-                with gr.Row():
+                with gr.Row(equal_height=True):
                     tries = [(gr.Button(label, size="sm"), f) for label, f in TRIES]
     result = gr.HTML(views.note("Record or upload a request to see the result."))
     gr.HTML(views.FOOT)
@@ -102,7 +116,7 @@ with gr.Blocks(title="Whose voice is this?", delete_cache=(600, voice.KEEP_S)) a
     setup_ready = [setup_audio.change, setup_audio.stop_recording, setup_audio.upload]
     gr.on(setup_ready, set_up, setup_audio, [owner, owner_status]).then(  # re-check any request for the new owner
         check, [check_audio, owner], result)
-    gr.on(setup_ready, owner_source, [setup_audio, my_setup], [tries_box, my_setup, example_owner, my_owner])
+    gr.on(setup_ready, example_requests, setup_audio, tries_box)
     setup_audio.clear(lambda: (None, views.chip(False, "No owner set up"), gr.Column(visible=False)), None,
                       [owner, owner_status, tries_box])
     gr.on([check_audio.change, check_audio.stop_recording, check_audio.upload], check, [check_audio, owner], result)
@@ -110,9 +124,14 @@ with gr.Blocks(title="Whose voice is this?", delete_cache=(600, voice.KEEP_S)) a
     setup_file.upload(any_file, setup_file, setup_audio)
     check_file.upload(any_file, check_file, check_audio)
     example_owner.click(lambda: str(EXAMPLES / EXAMPLE_OWNER), None, setup_audio)
-    my_owner.click(lambda mine: mine, my_setup, setup_audio)
     for btn, f in tries:
         btn.click(lambda f=f: str(EXAMPLES / f), None, check_audio)
+
+    # Saved speakers: survive a page reload, because they live in the browser's storage.
+    demo.load(lambda s: gr.Dropdown(choices=list(s or {})), saved, saved_list)
+    save_btn.click(save_speaker, [speaker_name, owner, saved], [saved, saved_list, speaker_name, owner_status])
+    saved_list.input(use_speaker, [saved_list, saved], [owner, owner_status, setup_audio, tries_box]).then(
+        check, [check_audio, owner], result)
 
 if __name__ == "__main__":
     demo.launch(theme=THEME, css=(HERE / "style.css").read_text(), js=FORCE_DARK, share=os.getenv("SHARE") == "1")

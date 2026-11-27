@@ -10,6 +10,7 @@
 }
 
 .gradio-container { max-width: 1180px !important; }
+.html-container { padding: 0 !important; } /* line our HTML up with Gradio's components */
 .playback { font-size: .75rem !important; height: auto !important; line-height: 1.4; } /* Gradio speed button */
 
 /* Header */
@@ -30,7 +31,7 @@
 .vc-muted { color: var(--vc-muted); font-size: .92rem; margin: .2rem 0 .6rem; }
 .vc-script { background: #1b1c1f; border-left: 3px solid var(--vc-accent); border-radius: 10px; padding: .8rem 1rem;
              line-height: 1.6; color: var(--vc-text); }
-.vc-chip { display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .85rem; border-radius: 999px;
+.vc-chip { white-space: nowrap; display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .85rem; border-radius: 999px;
            background: var(--vc-raised); font-size: .88rem; color: var(--vc-text); }
 .vc-dot { width: 8px; height: 8px; border-radius: 50%; background: #6b6d73; }
 .vc-chip.on .vc-dot { background: var(--vc-accent); }

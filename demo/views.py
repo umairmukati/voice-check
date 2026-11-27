@@ -78,7 +78,7 @@ def gauge(s, need):
     """Ring gauge: accent arc for the voice match, a white tick for what reading a message needs."""
     r, c = 62, 2 * math.pi * 62
     a = 2 * math.pi * frac(need) - math.pi / 2
-    x1, y1, x2, y2 = 80 + 52 * math.cos(a), 80 + 52 * math.sin(a), 80 + 74 * math.cos(a), 80 + 74 * math.sin(a)
+    x1, y1, x2, y2 = 80 + 54 * math.cos(a), 80 + 54 * math.sin(a), 80 + 70 * math.cos(a), 80 + 70 * math.sin(a)
     return (f'<svg class="vc-gauge" viewBox="0 0 160 160">'
             f'<circle class="vc-g-track" cx="80" cy="80" r="{r}"/>'
             f'<circle class="vc-g-arc" cx="80" cy="80" r="{r}" stroke-dasharray="{frac(s) * c:.1f} {c:.1f}" '
