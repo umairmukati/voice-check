@@ -230,17 +230,21 @@ def summary(r):
                                             "how_it_fails", "own_idea"))
     yn = lambda x: "yes" if x else "no"  # noqa: E731
 
+    # Each action is shown at the shortest speech whose owner lockout meets the limit on dev, else the longest.
+    shown = {a[t]["shown_at"] for t in TIERS}
+    same = len(shown) == 1
+
     def answer_row(t):
         m = L[t][f"{a[t]['shown_at']:g}"]
         lo, hi = m["owner_shut_out_ci"]
         return [t, f"1 in {1 / lim[t]['far']:,.0f} / {pct(lim[t]['frr'])}",
-                f"{a[t]['speech']:g} s" if a[t]["speech"] else "–", f"{a[t]['shown_at']:g} s",
+                *([] if same else [f"{a[t]['shown_at']:g} s"]),
                 f"{pct(m['owner_shut_out'])} ({pct(lo)}–{pct(hi)})", pct(m["colleague_in"], 2),
                 f"{pct(m['lookalike_in'], 2)} ({pct(m['lookalike_in_upper'], 2)})", yn(a[t]["met"]), yn(a[t]["proven"])]
 
     leaks = list(L["read"]["1"]["replay_in_both"])
-    replay_rows = [[f"{d} s", pct(m["replay_in_voice"], 2), *(pct(m["replay_in_both"][k], 2) for k in leaks)]
-                   for d, m in L["read"].items()]
+    replay_rows = [[f"{d} s", pct(m["replay_in_voice"], 2), *(pct(m["replay_in_both"][k], 2) for k in leaks),
+                    pct(r["motion_check_fails"][d])] for d, m in L["read"].items()]
     stranger_rows = [[x["stranger"], x["owner"], yn(x["same_sex"]), str(x["times"])] for x in f["strangers_in"]]
     owner_rows = [[s, pct(v)] for s, v in f["owners_over_limit"]]
     owner_rows.append([f"other {f['other_owners']['count']} owners", pct(f["other_owners"]["shut_out"])])
@@ -251,19 +255,22 @@ def summary(r):
         f"Test: {sp['test']} speakers. Limits and speech length chosen on {sp['dev']} other speakers. "
         f"Trials per speech length: {n['own']} owner, {n['colleague']} same-sex colleague, {n['lookalike']} lookalike.", "",
         "## Answer", "",
-        *table(["Action", "Limits: strangers in / owner shut out", "Speech chosen on dev", "Measured at",
+        "Speech: the shortest length whose owner lockout meets the limit on the dev speakers, else the longest. "
+        + (f"Here: {shown.pop():g} s for every action." if same else ""), "",
+        *table(["Action", "Limits: strangers in / owner shut out", *([] if same else ["Speech"]),
                 "Owner shut out (95% CI)", "Colleague in", "Lookalike in (95% upper)", "Limits met", "Stranger limit proven"],
                [answer_row(t) for t in TIERS]),
         "", "## By speech length: owner shut out / lookalike in", "",
         *table(["Speech", *TIERS], [[f"{d} s", *(f"{pct(L[t][d]['owner_shut_out'])} / {pct(L[t][d]['lookalike_in'], 2)}"
                                                  for t in TIERS)] for d in L["read"]]),
-        "", "## Motion check: owner fails", "",
-        *table(["Speech", *(f"{d} s" for d in r["motion_check_fails"])], [["Owner fails", *map(pct, r["motion_check_fails"].values())]]),
-        "", "## Replay passes (simulated, read limit)", "",
-        *table(["Speech", "Voice check", *(f"Voice + motion, leak {k}" for k in leaks)], replay_rows),
-        "", f"## Strangers let in (read, {f['speech']:g} s)", "",
+        "", "## Replay: the owner's voice played from a loudspeaker (simulated, read limit)", "",
+        f"Share of replayed clips that pass. Leak: how much loudspeaker sound reaches the motion sensor ({leaks[0]} "
+        f"assumed, 0 dB as strong as the wearer's own voice). Last column: the real owner failing the motion check.", "",
+        *table(["Speech", "Voice check", *(f"Voice + motion, leak {k}" for k in leaks), "Owner fails motion check"],
+               replay_rows),
+        "", f"## Strangers let in (read, {f['speech']:g} s; speaker IDs)", "",
         *(table(["Stranger", "Owner", "Same sex", "Times"], stranger_rows) if stranger_rows else ["None."]),
-        "", f"## Owners shut out over {pct(lim['read']['frr'], 0)} (read, {f['speech']:g} s)", "",
+        "", f"## Owners shut out over {pct(lim['read']['frr'], 0)} (read, {f['speech']:g} s; owner IDs)", "",
         *table(["Owner", "Shut out"], owner_rows),
         "", "## Own idea (act limit, voice check only)", "",
         *table(["Request", "Owner shut out", "Strangers in"],
