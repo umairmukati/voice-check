@@ -10,7 +10,7 @@ In a macOS or Linux terminal. On Windows, run `wsl --install` in PowerShell once
 
 ```
 # Clone
-git clone <repo-url> && cd voice-check
+git clone https://github.com/umairmukati/voice-check && cd voice-check
 
 # Install uv (once, if you don't have it)
 curl -LsSf https://astral.sh/uv/install.sh | sh
